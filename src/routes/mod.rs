@@ -1,5 +1,6 @@
 use crate::auth::{auth_handler, auth_middleware::auth_middleware};
 use crate::app::AppState;
+use crate::health::health_handler;
 use crate::middleware::error_middleware::error_handling_middleware;
 use crate::middleware::rate_limiter::{rate_limit_middleware, RateLimiter};
 use crate::user::user_handler;
@@ -53,6 +54,8 @@ pub fn create_routes(app_state: AppState) -> Router {
         .layer(from_fn_with_state(normal_limiter, rate_limit_middleware));
 
     Router::new()
+        .route("/health", axum::routing::get(health_handler::health_check_handler))
+        .route("/ready", axum::routing::get(health_handler::readiness_check_handler))
         .nest("/auth", auth_routes)
         .nest("/api", protected_routes)
         .layer(from_fn(error_handling_middleware))

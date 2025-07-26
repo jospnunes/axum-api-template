@@ -3,6 +3,7 @@ mod auth;
 mod config;
 mod db;
 mod errors;
+mod health;
 mod middleware;
 mod routes;
 mod schema;

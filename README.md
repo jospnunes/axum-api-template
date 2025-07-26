@@ -28,8 +28,6 @@ cargo install diesel_cli --no-default-features --features postgres
 ### 2. Configurar Banco de Dados
 ```bash
 # Criar bancos de dados
-createdb api_template_dev
-createdb api_template_test
 
 # Configurar variáveis de ambiente
 cp .env.example .env
@@ -37,10 +35,24 @@ cp .env.example .env
 
 ### 3. Editar arquivo .env
 ```env
+# Database
 DATABASE_URL=postgresql://username:password@localhost/api_template_dev
 TEST_DATABASE_URL=postgresql://username:password@localhost/api_template_test
+
+# JWT Secrets
 JWT_ACCESS_SECRET=your-super-secret-access-key-here
 JWT_REFRESH_SECRET=your-super-secret-refresh-key-here
+
+# Server
+SERVER_HOST=127.0.0.1
+SERVER_PORT=3000
+
+# CORS
+CORS_ORIGIN=http://localhost:3000
+
+# Rate Limiting
+RATE_LIMIT_REQUESTS_PER_MINUTE=60
+RATE_LIMIT_BURST=10
 ```
 
 ### 4. Executar Migrations
@@ -60,12 +72,15 @@ A API estará disponível em `http://localhost:3000`
 ```
 src/
 ├── main.rs              # Ponto de entrada
+├── lib.rs               # Biblioteca principal
 ├── app.rs               # Configuração da aplicação
+├── schema.rs            # Schema do banco (gerado pelo Diesel)
 ├── config/              # Configurações (banco, etc.)
 ├── middleware/          # Middleware customizados
 ├── errors/              # Tratamento de erros padronizado
 ├── auth/                # Sistema de autenticação JWT
 ├── user/                # Módulo de usuários
+├── health/              # Endpoints de health check
 ├── db/models/           # Modelos Diesel
 ├── routes/              # Configuração de rotas
 └── utils/               # Utilitários
@@ -120,6 +135,10 @@ cargo test -- --nocapture
 
 ## 🌐 API Endpoints
 
+### Health Check (Públicas)
+- `GET /health` - Status básico da aplicação
+- `GET /ready` - Verificação de prontidão (inclui conexão com banco)
+
 ### Autenticação (Públicas)
 - `POST /auth/register` - Registrar novo usuário
 - `POST /auth/login` - Login com email/senha
@@ -132,9 +151,15 @@ cargo test -- --nocapture
 - `PUT /api/user/profile` - Atualizar perfil do usuário
 - `POST /api/logout` - Logout (revoga tokens)
 
-### Exemplo de Requisição
+### Exemplo de Requisições
 
 ```bash
+# Health check básico
+curl -X GET http://localhost:3000/health
+
+# Verificação de prontidão
+curl -X GET http://localhost:3000/ready
+
 # Registrar usuário
 curl -X POST http://localhost:3000/auth/register \
   -H "Content-Type: application/json" \
@@ -158,12 +183,24 @@ curl -X POST http://localhost:3000/auth/login \
 
 ### Variáveis de Ambiente
 ```env
+# Database
 DATABASE_URL=postgresql://user:pass@host:5432/db_prod
+TEST_DATABASE_URL=postgresql://user:pass@host:5432/db_test
+
+# JWT Secrets
 JWT_ACCESS_SECRET=your-super-secure-production-secret
 JWT_REFRESH_SECRET=your-super-secure-refresh-secret
+
+# Server
 SERVER_HOST=0.0.0.0
 SERVER_PORT=3000
+
+# CORS
 CORS_ORIGIN=https://yourdomain.com
+
+# Rate Limiting
+RATE_LIMIT_REQUESTS_PER_MINUTE=100
+RATE_LIMIT_BURST=20
 ```
 
 ### Build e Deploy
@@ -173,37 +210,6 @@ cargo build --release
 
 # Executar em produção
 ./target/release/axum-api-template
-```
-
-## 🛠️ Troubleshooting
-
-### Problemas Comuns
-
-**Erro de conexão com banco:**
-```bash
-# Verificar se PostgreSQL está rodando
-pg_isready
-
-# Verificar URL de conexão
-echo $DATABASE_URL
-```
-
-**Erro de migrations:**
-```bash
-# Verificar status das migrations
-diesel migration list
-
-# Forçar reset (cuidado!)
-diesel database reset
-```
-
-**Problemas de compilação:**
-```bash
-# Limpar cache
-cargo clean
-
-# Atualizar dependências
-cargo update
 ```
 
 
