@@ -2,6 +2,24 @@
 
 Template completo para APIs REST usando Axum, baseado em boas práticas de arquitetura modular.
 
+## 🎯 Como Usar Este Template
+
+### Opção 1: Usar Template do GitHub
+1. Clique em **"Use this template"** no topo da página
+2. Crie seu novo repositório
+3. Clone o repositório criado
+4. Siga os passos de configuração abaixo
+
+### Opção 2: Clone Manual
+```bash
+git clone https://github.com/seu-usuario/axum-api-template.git meu-projeto
+cd meu-projeto
+rm -rf .git
+git init
+git add .
+git commit -m "Initial commit from template"
+```
+
 ## 🚀 Características
 
 - **Axum** - Framework web moderno e performático
